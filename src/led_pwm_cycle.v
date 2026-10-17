@@ -1,20 +1,20 @@
 // ============================================================================
 // Mojo V3 -- "LED PWM cycle" bitstream
 // ----------------------------------------------------------------------------
-// Each on-board LED cycles through three brightness levels -- 25%, 75% and
+// Each on-board LED cycles through three brightness levels -- 0%, 25% and
 // 100% -- stepping to the next level once per second. Starting point:
 //
-//   led[0] = 25%,  led[1] = 75%,  led[2] = 100%,  led[3] = 25%,
-//   led[4] = 75%,  led[5] = 100%, led[6] = 25%,   led[7] = 75%.
+//   led[0] = 0%,   led[1] = 25%,  led[2] = 100%,  led[3] = 0%,
+//   led[4] = 25%,  led[5] = 100%, led[6] = 0%,    led[7] = 25%.
 //
-// After 1 s every LED advances one level (25 -> 75 -> 100 -> 25, ...), so
-// the pattern shifts by one level per second; each LED completes a full
-// cycle every 3 s.
+// After 1 s every LED advances one level (0 -> 25 -> 100 -> 0, ...), so the
+// pattern shifts by one level per second; each LED completes a full cycle
+// every 3 s.
 //
 // The LEDs are plain digital outputs (LVTTL, active high) -- there is no
 // analog dimming. Brightness is implemented as PWM: a 1 kHz PWM waveform
 // (1 ms period = 50,000 ticks of the 50 MHz clock) with duty cycle
-// 25 / 75 / 100%. 1 kHz is far above the human flicker-fusion threshold, so
+// 0 / 25 / 100%. 1 kHz is far above the human flicker-fusion threshold, so
 // the duty cycles read as steady brightnesses.
 //
 // Ports match led_test.ucf (clk P56, rst_n P38,
@@ -57,14 +57,14 @@ module led_pwm_cycle (
 
   // ---------------------------------------------------------------------------
   // duty = number of PWM ticks the LED is high within one 1 ms period:
-  // level 0 -> 12500 (25%), level 1 -> 37500 (75%), level 2 -> 50000 (on).
+  // level 0 -> 0 (off), level 1 -> 12500 (25%), level 2 -> 50000 (always on).
   // ---------------------------------------------------------------------------
   function [15:0] duty_of;
     input [1:0] lvl;
     begin
       case (lvl)
-        2'd0:    duty_of = 16'd12500;
-        2'd1:    duty_of = 16'd37500;
+        2'd0:    duty_of = 16'd0;
+        2'd1:    duty_of = 16'd12500;
         2'd2:    duty_of = 16'd50000;
         default: duty_of = 16'd0;
       endcase
